@@ -1,0 +1,26 @@
+{
+  "name": "yalog4ts",
+  "version": "1.0.0",
+  "description": "A log4j like logger for ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["/dist"],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "jest"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "7.14.8",
+    "@babel/preset-env": "7.14.8",
+    "@babel/preset-typescript": "7.14.5",
+    "@types/jest": "26.0.24",
+    "babel-jest": "27.0.6",
+    "jest": "27.0.6",
+    "ts-node": "10.1.0",
+    "typescript": "4.3.5"
+  }
+}
