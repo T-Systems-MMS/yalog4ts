@@ -1,7 +1,7 @@
 {
   "name": "yalog4ts",
-  "version": "1.0.0",
-  "description": "A log4j like logger for ts",
+  "version": "1.0.2",
+  "description": "A log4j-like logger for ts",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
