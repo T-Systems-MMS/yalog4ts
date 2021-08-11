@@ -77,7 +77,9 @@ export class LoggerFactory {
             this.theInstance.theRootLevel = config.rootLevel;
         }
         this.theInstance.restoreConfig();
-        console.log(`Logging system initialized with root level '${Level[this.theInstance.theRootLevel]}'.`);
+        if (! config.suppressBootstrapLogging) {
+            console.log(`Logging system initialized with root level '${Level[this.theInstance.theRootLevel]}'.`);
+        }
         // make ourselves available on the console if allowed by app config
         if (config.consoleFeature) {
             const consoleContext = config.consoleContext ? config.consoleContext : 'lf';
@@ -89,11 +91,15 @@ export class LoggerFactory {
                 Object.keys(Level)
                     .filter(level => isNaN(+level))
                     .forEach(level => context[level] = level);
-                console.log(`Logging cli is available at '${consoleContext}'.`);
+                if (! config.suppressBootstrapLogging) {
+                    console.log(`Logging cli is available at '${consoleContext}'.`);
+                    }
             } else {
-                console.log(
-                    'No window object available, reduced functionality.'
-                );
+                if (! config.suppressBootstrapLogging) {
+                    console.log(
+                        'No window object available, reduced functionality.'
+                    );
+                }
             }
         }
 
