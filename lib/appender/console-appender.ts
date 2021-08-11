@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Appender } from './logger';
+import { Appender } from '../logger';
 
 /**
  * Console log appender.
@@ -49,3 +49,43 @@ export class ConsoleAppender implements Appender {
     }
 }
 
+export class LoggerConsoleOnly implements Appender {
+    // constructor(protected loggerName: string) {
+    // //   super(loggerName);
+    // }
+  
+    get trace() {
+        return console.log.bind(console);
+      }
+    get debug() {
+      return console.log.bind(console);
+    }
+  
+    get info() {
+        return console.info.bind(console);
+    }
+  
+    get warn() {
+        return console.warn.bind(console);
+    }
+  
+    get error() {
+        return console.error.bind(console);
+    }
+  
+    get group() {
+        return console.group.bind(console);
+    }
+
+    get groupEnd() {
+        return console.groupEnd.bind(console);
+    }
+  
+    get dirxml() {
+        return console.dirxml.bind(console);
+    }
+    get dir() {
+        return console.dir.bind(console);
+    }
+
+}

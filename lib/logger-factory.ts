@@ -6,7 +6,7 @@ import {
     Logger,
     PersistenceAppender,
 } from './logger';
-import { ConsoleAppender } from './console-appender';
+import { ConsoleAppender } from './appender/console-appender';
 import { LoggerFactoryConfig } from './logger-factory-config';
 import { set, get } from 'lodash-es';
 
@@ -112,7 +112,7 @@ export class LoggerFactory {
         /* tslint:disable:max-line-length */
         const helpString = `To set the root log level, type '${consoleContext}.level=<level>', where <level> is one of [${consoleContext}.TRACE, ${consoleContext}.DEBUG, ${consoleContext}.INFO, ${consoleContext}.WARN, ${consoleContext}.ERROR].
     To set the log level for a specific logger, type '${consoleContext}.setLogLevel(<arg>, <level>)' or '${consoleContext}.sll(<arg>, <level>)', where <arg> is either the name of the logger (wildcard supported) or a logger's index and <level> is one of [lf${consoleContext}.TRACE, ${consoleContext}.DEBUG, ${consoleContext}.INFO, ${consoleContext}.WARN, ${consoleContext}.ERROR].
-    To view loggers and their indices, type '${consoleContext}.listLoggers' or '${consoleContext}.ll'`;
+    To view loggers and their indices, type '${consoleContext}.listLoggers()' or '${consoleContext}.ll()'`;
         return helpString
     }
 

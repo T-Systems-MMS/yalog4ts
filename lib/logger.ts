@@ -1,3 +1,5 @@
+import { LoggerConsoleOnly } from "./appender/console-appender";
+
 /**
  * A logger class which allows to emit log messages along with a log level.
  * The log level is used to conditionally print the message to the console.
@@ -111,7 +113,7 @@ export class Logger {
      * @param optionalParams the optional params
      */
     public info(msg: unknown, ...optionalParams: any[]): void {
-        this.log(Level.INFO, 'info', msg, optionalParams);
+         this.log(Level.INFO, 'info', msg, optionalParams);
     }
 
     /**
@@ -195,10 +197,16 @@ export class Logger {
     ) {
         if (this.shouldLog(requiredLevel)) {
             this.appenders.forEach(appender =>
-                appender[logFunction](
-                    format ? this.formatLogMessage(requiredLevel, msg) : msg,
-                    ...(optionalParams || [])
-                )
+                // {if (appender instanceof LoggerConsoleOnly) {
+                //     appender[logFunction].bind(console, [msg, ...optionalParams]);
+                // } else {
+
+                    appender[logFunction](
+                        format ? this.formatLogMessage(requiredLevel, msg) : msg,
+                        ...(optionalParams || [])
+                    )
+                // }
+                // }
             );
         }
     }

@@ -1,4 +1,4 @@
-import { PersistenceAppender } from './logger';
+import { PersistenceAppender } from '../logger';
 
 /** storage key */
 export const LOCAL_STORAGE_KEY = 'log';

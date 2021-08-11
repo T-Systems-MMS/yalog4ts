@@ -1,5 +1,5 @@
 import { getValidLevel, Level, Logger } from './logger';
-import { ConsoleAppender } from './console-appender';
+import { ConsoleAppender } from './appender/console-appender';
 
 describe('Logger', () => {
     const defaultLevel = Level.INFO;

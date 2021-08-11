@@ -1,10 +1,11 @@
+import { LoggerConsoleOnly } from './appender/console-appender';
 import { Appender, Level, Logger } from './logger';
 import {
     DEFAULT_ROOT_LEVEL,
     LoggerFactory
 } from './logger-factory';
 import { LoggerFactoryConfig } from './logger-factory-config';
-import { LocalStorageAppender } from './logger-localstorage-appender';
+import { LocalStorageAppender } from './appender/logger-localstorage-appender';
 
 describe('Logging system', () => {
     // this is the logger "under test"
@@ -35,10 +36,17 @@ describe('Logging system', () => {
         expect(LoggerFactory.getLogger('').name).toBe('default');
     });
 
-    it('should provide a logger', () => {
+    it('shouldibudi provide a logger', () => {
+        const appender = new LoggerConsoleOnly()
+        LoggerFactory.registerAppender('console-bind', appender);
+        loggerFactoryInstance.setLogAppenders('console-bind');
+        logger = LoggerFactory.getLogger('foo')
         expect(logger).not.toBeNull();
         expect(logger.level).toBeNull();
         expect(logger.rootLevel).toBe(DEFAULT_ROOT_LEVEL);
+        expect(logger.appenders[0]).toBe(appender)
+        // logger.error('nooooouuuuu')
+        logger.info('nooooouuuuu')
     });
 
     it('should store and load the levels', () => {

@@ -1,7 +1,7 @@
 
-import { Level, Logger } from './logger';
-import { LoggerFactory } from './logger-factory';
-import { LoggerFactoryConfig } from './logger-factory-config';
+import { Level, Logger } from '../logger';
+import { LoggerFactory } from '../logger-factory';
+import { LoggerFactoryConfig } from '../logger-factory-config';
 import { LocalStorageAppender } from './logger-localstorage-appender';
 
 describe('LocalStorageAppender', () => {
