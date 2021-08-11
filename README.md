@@ -8,7 +8,7 @@ This is is yet another log4j-like logging framework for typescript. Base feature
 
 ## Installation
 
-Install it with `npm installs --save yalog4ts`.
+Install it with `npm install --save yalog4ts`.
 
 ## Usage
 
@@ -40,5 +40,5 @@ If enabled via configuration, yalog4ts registers some console features to set th
 
 Basic features are: 
 * `lf.listloggers()` or its short equivalent `lf.ll()` to list all registered loggers along with their log levels
-* `lf.setLogLevel(loggerIndexOrName, level)` or its short equivalent `lf.sll()` to set the log level for specific loggers, e.g. `lf.sll('loggerName', lf.DEBUG)` or `lf.sll(lf.sll(1, lf.DEBUG))` (index from `lf.ll()`)
+* `lf.setLogLevel(loggerIndexOrName, level)` or its short equivalent `lf.sll()` to set the log level for specific loggers, e.g. `lf.sll('loggerName', lf.DEBUG)` or `lf.sll(1, lf.DEBUG)` (index determined using `lf.ll()`)
 * Set the overall root level e.g. `lf.level = lf.DEBUG` 
