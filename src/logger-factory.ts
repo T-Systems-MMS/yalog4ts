@@ -6,9 +6,9 @@ import {
     Logger,
     PersistenceAppender,
 } from './logger';
-import { ConsoleAppender } from './logger-appender';
+import { ConsoleAppender } from './console-appender';
 import { LoggerFactoryConfig } from './logger-factory-config';
-import { LocalStorageAppender } from './logger-localstorage-appender';
+import { set, get } from 'lodash-es';
 
 /** the default root log level of the logging system */
 export const DEFAULT_ROOT_LEVEL = Level.INFO;
@@ -24,10 +24,6 @@ export const DEFAULT_APPENDERS = [];
  * Type `lf.help` on the browser console for details.
  */
 export class LoggerFactory {
-    /* tslint:disable:max-line-length */
-    public static helpString = `To set the root log level, type 'lf.level=<level>', where <level> is one of [lf.TRACE, lf.DEBUG, lf.INFO, lf.WARN, lf.ERROR].
-    To set the log level for a specific logger, type 'lf.setLogLevel(<arg>, <level>)' or 'lf.sll(<arg>, <level>)', where <arg> is either the name of the logger (wildcard supported) or a logger's index and <level> is one of [lf.TRACE, lf.DEBUG, lf.INFO, lf.WARN, lf.ERROR].
-    To view loggers and their indices, type 'lf.listLoggers' or 'lf.ll'`;
 
     // a simple object where log levels get stored by logger name
     storedLevels: { [key: string]: Level } = { __root: DEFAULT_ROOT_LEVEL };
@@ -42,21 +38,23 @@ export class LoggerFactory {
     theRootLevel: Level;
 
     // log appenders
-    appenders: {[key: string]: Appender};
+    appenders: { [key: string]: Appender };
 
     // the storage to store log levels to
     storage: Storage;
 
+    consoleContext: string;
+
     private static theInstance = new LoggerFactory();
-            
-    private  registeredAppenders: Map<string, Appender | (() => Appender)> = new Map();
+
+    private registeredAppenders: Map<string, Appender | (() => Appender)> = new Map();
 
     /**
      * Private constructor, should only be used from within LoggerFactory.
      */
     private constructor() {
         this.initLevels();
-        
+
     }
 
     /**
@@ -74,7 +72,7 @@ export class LoggerFactory {
     ): void {
         LoggerFactory.registerAppender('console', new ConsoleAppender());
         this.theInstance.setLogAppenders('console');
-        this.theInstance.storage = storage;        
+        this.theInstance.storage = storage;
         if (config.rootLevel) {
             this.theInstance.theRootLevel = config.rootLevel;
         }
@@ -83,27 +81,39 @@ export class LoggerFactory {
         // make ourselves available on the console if allowed by app config
         if (config.consoleFeature) {
             const consoleContext = config.consoleContext ? config.consoleContext : 'lf';
+            this.theInstance.consoleContext = consoleContext;
             if (window) {
-                window[consoleContext] = this.theInstance;
+                set(window, consoleContext, this.theInstance);
+                const context = get(window, consoleContext);
+
                 Object.keys(Level)
                     .filter(level => isNaN(+level))
-                    .forEach(level => window[consoleContext][level] = level);
+                    .forEach(level => context[level] = level);
                 console.log(`Logging cli is available at '${consoleContext}'.`);
-                } else {
+            } else {
                 console.log(
                     'No window object available, reduced functionality.'
                 );
             }
         }
-        
-        
+
+
     }
 
     /**
      * Get the help string.
      */
     public get help(): string {
-        return LoggerFactory.helpString;
+        return this.buildHelpString();
+    }
+
+    private buildHelpString(): string {
+        const consoleContext = this.consoleContext;
+        /* tslint:disable:max-line-length */
+        const helpString = `To set the root log level, type '${consoleContext}.level=<level>', where <level> is one of [${consoleContext}.TRACE, ${consoleContext}.DEBUG, ${consoleContext}.INFO, ${consoleContext}.WARN, ${consoleContext}.ERROR].
+    To set the log level for a specific logger, type '${consoleContext}.setLogLevel(<arg>, <level>)' or '${consoleContext}.sll(<arg>, <level>)', where <arg> is either the name of the logger (wildcard supported) or a logger's index and <level> is one of [lf${consoleContext}.TRACE, ${consoleContext}.DEBUG, ${consoleContext}.INFO, ${consoleContext}.WARN, ${consoleContext}.ERROR].
+    To view loggers and their indices, type '${consoleContext}.listLoggers' or '${consoleContext}.ll'`;
+        return helpString
     }
 
     /**
@@ -138,7 +148,7 @@ export class LoggerFactory {
             theName,
             factory.theRootLevel,
             level,
-            Object.values(factory.appenders)
+            factory.appenders ? Object.values(factory.appenders) : []
         );
         factory.cachedLoggers.set(theName, logger);
         return logger;
@@ -287,7 +297,7 @@ export class LoggerFactory {
         if (appenders) {
             this.appenders = appenders;
             LoggerFactory.getInstance().cachedLoggers.forEach(logger => {
-                logger.appenders = Object.values(appenders);
+                logger.appenders = appenders ? Object.values(appenders) : [];
             });
             this.storeConfig();
             return `Appenders "${Object.keys(appenders).join(
@@ -302,7 +312,7 @@ export class LoggerFactory {
      * Returns last log entries, if appender with persistence exists.
      */
     public get lastLog(): string {
-        const appender = Object.values(this.appenders).find(
+        const appender = (this.appenders ? Object.values(this.appenders) : []).find(
             (a: any) => typeof a.getLastLog === 'function'
         ) as PersistenceAppender;
         const log = appender ? appender.getLastLog() : undefined;
@@ -320,7 +330,7 @@ export class LoggerFactory {
     /**
      * Get the singleton instance of the logger factory.
      */
-    private static getInstance(): LoggerFactory {
+    public static getInstance(): LoggerFactory {
         return LoggerFactory.theInstance;
     }
 
@@ -329,7 +339,7 @@ export class LoggerFactory {
      */
     private initLevels() {
         this.storedLevels = { __root: DEFAULT_ROOT_LEVEL };
-        this.theRootLevel = getValidLevel(DEFAULT_ROOT_LEVEL);        
+        this.theRootLevel = getValidLevel(DEFAULT_ROOT_LEVEL);
     }
 
     /**
@@ -409,7 +419,7 @@ export class LoggerFactory {
                 ? this.storedLevels[name]
                 : undefined;
             logger.rootLevel = this.theRootLevel;
-            logger.appenders = Object.values(this.appenders);
+            logger.appenders = this.appenders ? Object.values(this.appenders) : []
         });
     }
 
@@ -421,35 +431,35 @@ export class LoggerFactory {
         if (theLevel === null) {
             return;
         }
-        LoggerFactory.getInstance().theRootLevel = theLevel;
-        LoggerFactory.getInstance().cachedLoggers.forEach((logger, _) => {
+        this.theRootLevel = theLevel;
+        this.cachedLoggers.forEach((logger, _) => {
             logger.rootLevel = theLevel;
         });
         this.storedLevels.__root = theLevel;
         this.storeConfig();
     }
     get level(): Level {
-        return LoggerFactory.getInstance().theRootLevel;
+        return this.theRootLevel;
     }
 
 
-/**
- * Returns appender identified by name, if not found ConsoleAppender.
- *
- * @param name name of appender
- */
- getValidAppender(name: string): Appender {
-    if (this.registeredAppenders.has(name)) {
-        const entry = this.registeredAppenders.get(name);
-        if (typeof entry === 'function') {
-            return entry();
-        } else {
-            return entry;
+    /**
+     * Returns appender identified by name, if not found ConsoleAppender.
+     *
+     * @param name name of appender
+     */
+    getValidAppender(name: string): Appender {
+        if (this.registeredAppenders.has(name)) {
+            const entry = this.registeredAppenders.get(name);
+            if (typeof entry === 'function') {
+                return entry();
+            } else {
+                return entry;
+            }
         }
+        return undefined;
+        // throw new Error(`found no appender with name '${name}'`);
     }
-    return undefined;
-    // throw new Error(`found no appender with name '${name}'`);
-}
 
 }
 

@@ -8,5 +8,5 @@ export class LoggerFactoryConfig {
     /** appenders */
     appenders: string[];
     consoleFeature?: boolean;
-    consoleContext?: string;
+    consoleContext?: string
 }
